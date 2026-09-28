@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Тренажер: таблиця множення</title>
+<style>
+  :root{
+    --bg1:#4f46e5;
+    --bg2:#7c3aed;
+    --card:#ffffff;
+    --text:#1e1b2e;
+    --muted:#8b87a3;
+    --ok:#22c55e;
+    --bad:#ef4444;
+    --accent:#4f46e5;
+  }
+  :root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px); background:#4f46e5;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --card:#ffffff; } }
+  :root[data-theme="dark"]{ --card:#ffffff; }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  button,.mode-btn,.table-chip,.count-btn,.key{touch-action:manipulation;}
+  html,body{min-height:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:16px;
+    color:var(--text);
+    user-select:none;
+  }
+  .app{
+    width:100%;
+    max-width:480px;
+  }
+  header{
+    text-align:center;
+    color:#fff;
+    margin-bottom:14px;
+  }
+  header h1{
+    font-size:22px;
+    margin:0 0 4px 0;
+    font-weight:700;
+  }
+  header p{
+    margin:0;
+    opacity:.85;
+    font-size:13px;
+  }
+
+  /* SCREENS */
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* SETUP */
+  .card{
+    background:var(--card);
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+  }
+  .section-title{
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin:0 0 10px 0;
+  }
+  .mode-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .mode-btn{
+    border:2px solid #e5e3f5;
+    background:#f7f6fd;
+    border-radius:14px;
+    padding:14px 8px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    cursor:pointer;
+    text-align:center;
+    line-height:1.3;
+  }
+  .mode-btn .emoji{display:block; font-size:22px; margin-bottom:4px;}
+  .mode-btn.selected{
+    border-color:var(--accent);
+    background:#ece9fd;
+    color:var(--accent);
+  }
+
+  .tables-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .table-chip{
+    aspect-ratio:1;
+    border-radius:12px;
+    border:2px solid #e5e3f5;
+    background:#f7f6fd;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:16px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .table-chip.selected{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+
+  .count-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:22px;
+  }
+  .count-btn{
+    flex:1;
+    padding:10px 4px;
+    border-radius:12px;
+    border:2px solid #e5e3f5;
+    background:#f7f6fd;
+    font-weight:700;
+    font-size:14px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  .count-btn.selected{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+
+  .start-btn{
+    width:100%;
+    padding:16px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#fff;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(79,70,229,.35);
+  }
+  .start-btn:active{transform:scale(.98);}
+
+  /* QUIZ */
+  .quiz-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#fff;
+    margin-bottom:10px;
+    font-size:14px;
+    font-weight:600;
+  }
+  .progress-bar{
+    width:100%;
+    height:8px;
+    background:rgba(255,255,255,.3);
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:16px;
+  }
+  .progress-fill{
+    height:100%;
+    background:#fff;
+    border-radius:10px;
+    width:0%;
+    transition:width .25s ease;
+  }
+  .question-card{
+    background:var(--card);
+    border-radius:20px;
+    padding:28px 20px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+    margin-bottom:16px;
+  }
+  .question-text{
+    font-size:42px;
+    font-weight:800;
+    color:var(--text);
+    letter-spacing:1px;
+  }
+  .feedback{
+    min-height:22px;
+    font-size:15px;
+    font-weight:700;
+    margin-top:8px;
+  }
+  .feedback.ok{color:var(--ok);}
+  .feedback.bad{color:var(--bad);}
+
+  .answers-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .answer-btn{
+    padding:18px 8px;
+    font-size:22px;
+    font-weight:700;
+    border-radius:16px;
+    border:none;
+    background:#fff;
+    color:var(--text);
+    box-shadow:0 6px 16px rgba(0,0,0,.15);
+    cursor:pointer;
+  }
+  .answer-btn:active{transform:scale(.96);}
+  .answer-btn.correct{background:var(--ok); color:#fff;}
+  .answer-btn.incorrect{background:var(--bad); color:#fff;}
+  .answer-btn[disabled]{opacity:.9;}
+
+  /* RESULT */
+  .result-card{
+    background:var(--card);
+    border-radius:20px;
+    padding:28px 20px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+  }
+  .result-emoji{font-size:56px; margin-bottom:6px;}
+  .result-score{font-size:34px; font-weight:800; margin:6px 0;}
+  .result-sub{color:var(--muted); font-size:14px; margin-bottom:20px;}
+  .result-mistakes{
+    text-align:left;
+    background:#f7f6fd;
+    border-radius:14px;
+    padding:12px 16px;
+    margin-bottom:20px;
+    max-height:180px;
+    overflow-y:auto;
+  }
+  .result-mistakes div{
+    padding:6px 0;
+    font-size:14px;
+    border-bottom:1px solid #e5e3f5;
+  }
+  .result-mistakes div:last-child{border-bottom:none;}
+  .btn-row{display:flex; gap:10px;}
+  .secondary-btn{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+    border:2px solid #e5e3f5;
+    background:#fff;
+    color:var(--text);
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+  .primary-btn{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+  }
+
+  /* ANSWER FORMAT */
+  .format-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
+
+  /* TYPED ANSWER */
+  .input-area{display:none;}
+  .input-area.active{display:block;}
+  .answer-display{
+    margin:14px auto 0; min-width:120px; max-width:200px; height:58px;
+    border-radius:14px; border:3px solid #e5e3f5; background:#f7f6fd;
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px; font-weight:800; color:var(--text);
+  }
+  .answer-display.empty{color:#c9c6dd;}
+  .answer-display.ok{border-color:var(--ok); background:#dcfce7; color:#15803d;}
+  .answer-display.bad{border-color:var(--bad); background:#fee2e2; color:#b91c1c;}
+  .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .key{
+    padding:16px 0; font-size:24px; font-weight:700; border:none; border-radius:16px;
+    background:#fff; color:var(--text); box-shadow:0 6px 16px rgba(0,0,0,.15); cursor:pointer;
+    font-family:inherit;
+  }
+  .key:active{transform:scale(.95);}
+  .key.del{background:#f1effb; font-size:20px;}
+  .key.check{background:var(--ok); color:#fff; font-size:20px;}
+  .key[disabled]{opacity:.6;}
+  :focus-visible{outline:3px solid #fde047; outline-offset:2px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🧮 Тренажер таблиці множення</h1>
+    <p>Множення та ділення · таблиці 2–9</p>
+  </header>
+
+  <!-- SETUP SCREEN -->
+  <div class="screen active" id="setupScreen">
+    <div class="card">
+      <p class="section-title">Тип вправ</p>
+      <div class="mode-grid">
+        <div class="mode-btn selected" data-mode="mul">
+          <span class="emoji">✖️</span>Множення
+        </div>
+        <div class="mode-btn" data-mode="div">
+          <span class="emoji">➗</span>Ділення
+        </div>
+        <div class="mode-btn" data-mode="mix" style="grid-column:1 / -1;">
+          <span class="emoji">🔀</span>Змішано (множення + ділення)
+        </div>
+      </div>
+
+      <p class="section-title">Як відповідати</p>
+      <div class="format-row">
+        <div class="mode-btn fmt-btn selected" data-format="type">
+          <span class="emoji">✍️</span>Вписувати
+        </div>
+        <div class="mode-btn fmt-btn" data-format="choice">
+          <span class="emoji">🔘</span>Вибирати варіант
+        </div>
+      </div>
+
+      <p class="section-title">Таблиці</p>
+      <div class="tables-grid" id="tablesGrid"></div>
+
+      <p class="section-title">Кількість запитань</p>
+      <div class="count-row" id="countRow">
+        <div class="count-btn" data-count="10">10</div>
+        <div class="count-btn selected" data-count="15">15</div>
+        <div class="count-btn" data-count="20">20</div>
+        <div class="count-btn" data-count="30">30</div>
+      </div>
+
+      <button class="start-btn" id="startBtn">Почати ▶</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="quizScreen">
+    <div class="quiz-top">
+      <span id="quizProgressText">1 / 15</span>
+      <span id="quizScoreText">✅ 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+    <div class="question-card">
+      <div class="question-text" id="questionText">6 × 7 = ?</div>
+      <div class="answer-display empty" id="answerDisplay">?</div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="answers-grid" id="answersGrid"></div>
+
+    <div class="input-area" id="inputArea">
+      <div class="keypad" id="keypad">
+        <button class="key" data-k="1">1</button><button class="key" data-k="2">2</button><button class="key" data-k="3">3</button>
+        <button class="key" data-k="4">4</button><button class="key" data-k="5">5</button><button class="key" data-k="6">6</button>
+        <button class="key" data-k="7">7</button><button class="key" data-k="8">8</button><button class="key" data-k="9">9</button>
+        <button class="key del" data-k="del" aria-label="Стерти">⌫</button><button class="key" data-k="0">0</button><button class="key check" data-k="ok">✓</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="screen" id="resultScreen">
+    <div class="result-card">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-score" id="resultScore">15 / 15</div>
+      <div class="result-sub" id="resultSub">Чудовий результат!</div>
+      <div class="result-mistakes" id="mistakesBox" style="display:none;"></div>
+      <div class="btn-row">
+        <button class="secondary-btn" id="backToSetupBtn">Налаштування</button>
+        <button class="primary-btn" id="retryBtn">Ще раз</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ---------- STATE ----------
+  let selectedMode = 'mul';
+  let selectedTables = new Set([2,3,4,5,6,7,8,9]);
+  let selectedCount = 15;
+  let selectedFormat = 'type';
+  let typed = '';
+
+  let questions = [];
+  let currentIndex = 0;
+  let score = 0;
+  let mistakes = [];
+  let locked = false;
+
+  // ---------- SETUP SCREEN BUILD ----------
+  const tablesGrid = document.getElementById('tablesGrid');
+  for(let t=2; t<=9; t++){
+    const chip = document.createElement('div');
+    chip.className = 'table-chip selected';
+    chip.textContent = t;
+    chip.dataset.table = t;
+    chip.addEventListener('click', () => {
+      if(selectedTables.has(t)){
+        if(selectedTables.size === 1) return; // не даємо зняти останню
+        selectedTables.delete(t);
+        chip.classList.remove('selected');
+      } else {
+        selectedTables.add(t);
+        chip.classList.add('selected');
+      }
+    });
+    tablesGrid.appendChild(chip);
+  }
+
+  document.querySelectorAll('.mode-btn[data-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.mode-btn[data-mode]').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedMode = btn.dataset.mode;
+    });
+  });
+
+  document.querySelectorAll('.count-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.count-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCount = parseInt(btn.dataset.count,10);
+    });
+  });
+
+  document.querySelectorAll('.fmt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.fmt-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedFormat = btn.dataset.format;
+    });
+  });
+
+  document.getElementById('startBtn').addEventListener('click', startQuiz);
+  document.getElementById('retryBtn').addEventListener('click', startQuiz);
+  document.getElementById('backToSetupBtn').addEventListener('click', ()=>{
+    showScreen('setupScreen');
+  });
+
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  // ---------- QUESTION GENERATION ----------
+  function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+  function makeQuestion(type){
+    const tablesArr = Array.from(selectedTables);
+    const table = tablesArr[randInt(0, tablesArr.length-1)];
+    const other = randInt(2,9);
+
+    if(type === 'mul'){
+      const a = table, b = other;
+      const correct = a*b;
+      return {
+        text: `${a} × ${b} = ?`,
+        correct: correct,
+        options: buildOptions(correct)
+      };
+    } else {
+      // ділення: table * other ÷ table = other, завжди ціле
+      const a = table * other; // ділене
+      const b = table;         // дільник
+      const correct = other;
+      return {
+        text: `${a} ÷ ${b} = ?`,
+        correct: correct,
+        options: buildOptions(correct)
+      };
+    }
+  }
+
+  function buildOptions(correct){
+    const opts = new Set([correct]);
+    while(opts.size < 4){
+      const delta = randInt(-8,8);
+      let candidate = correct + delta;
+      if(candidate < 0) candidate = correct + randInt(1,9);
+      if(candidate === correct) continue;
+      opts.add(candidate);
+    }
+    return shuffle(Array.from(opts));
+  }
+
+  function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+  }
+
+  // ---------- QUIZ FLOW ----------
+  function startQuiz(){
+    questions = [];
+
+    if(selectedMode === 'mix'){
+      // ділення не більше 40% від усіх питань
+      const divCount = Math.floor(selectedCount * 0.4);
+      const mulCount = selectedCount - divCount;
+      const types = [];
+      for(let i=0;i<mulCount;i++) types.push('mul');
+      for(let i=0;i<divCount;i++) types.push('div');
+      shuffle(types);
+      types.forEach(t => questions.push(makeQuestion(t)));
+    } else {
+      for(let i=0;i<selectedCount;i++){
+        questions.push(makeQuestion(selectedMode));
+      }
+    }
+
+    currentIndex = 0;
+    score = 0;
+    mistakes = [];
+    showScreen('quizScreen');
+    renderQuestion();
+  }
+
+  const questionText = document.getElementById('questionText');
+  const feedback = document.getElementById('feedback');
+  const answersGrid = document.getElementById('answersGrid');
+  const progressFill = document.getElementById('progressFill');
+  const quizProgressText = document.getElementById('quizProgressText');
+  const quizScoreText = document.getElementById('quizScoreText');
+
+  function renderQuestion(){
+    locked = false;
+    const q = questions[currentIndex];
+    questionText.textContent = q.text;
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    quizProgressText.textContent = `${currentIndex+1} / ${questions.length}`;
+    quizScoreText.textContent = `✅ ${score}`;
+    progressFill.style.width = `${(currentIndex/questions.length)*100}%`;
+
+    answersGrid.innerHTML = '';
+    const isType = selectedFormat === 'type';
+    inputArea.classList.toggle('active', isType);
+    answersGrid.style.display = isType ? 'none' : 'grid';
+    answerDisplay.style.display = isType ? 'flex' : 'none';
+    questionText.textContent = isType ? q.text.replace(' ?','') : q.text;
+    if(isType){
+      typed = '';
+      updateDisplay();
+      keys.forEach(k=>k.disabled=false);
+      return;
+    }
+    q.options.forEach(opt=>{
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=> handleAnswer(btn, opt, q));
+      answersGrid.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(btn, chosen, q){
+    if(locked) return;
+    locked = true;
+    const allBtns = answersGrid.querySelectorAll('.answer-btn');
+    allBtns.forEach(b=>b.disabled = true);
+
+    if(chosen === q.correct){
+      btn.classList.add('correct');
+      feedback.textContent = 'Правильно! 🎉';
+      feedback.className = 'feedback ok';
+      score++;
+    } else {
+      btn.classList.add('incorrect');
+      allBtns.forEach(b=>{
+        if(parseInt(b.textContent,10) === q.correct) b.classList.add('correct');
+      });
+      feedback.textContent = `Неправильно. Відповідь: ${q.correct}`;
+      feedback.className = 'feedback bad';
+      mistakes.push(`${q.text.replace('?', q.correct)}`);
+    }
+
+    quizScoreText.textContent = `✅ ${score}`;
+
+    setTimeout(()=>{
+      currentIndex++;
+      if(currentIndex >= questions.length){
+        finishQuiz();
+      } else {
+        renderQuestion();
+      }
+    }, 900);
+  }
+
+  const answerDisplay = document.getElementById('answerDisplay');
+  const inputArea = document.getElementById('inputArea');
+  const keys = document.querySelectorAll('.key');
+
+  function updateDisplay(){
+    answerDisplay.textContent = typed === '' ? '?' : typed;
+    answerDisplay.className = 'answer-display' + (typed === '' ? ' empty' : '');
+  }
+
+  function pressKey(k){
+    if(locked || selectedFormat !== 'type') return;
+    if(k === 'del'){ typed = typed.slice(0,-1); updateDisplay(); return; }
+    if(k === 'ok'){ checkTyped(); return; }
+    if(typed.length >= 3) return;
+    if(typed === '0') typed = '';
+    typed += k;
+    updateDisplay();
+  }
+
+  keys.forEach(btn=>btn.addEventListener('click', ()=>pressKey(btn.dataset.k)));
+
+  document.addEventListener('keydown', e=>{
+    if(!document.getElementById('quizScreen').classList.contains('active')) return;
+    if(/^[0-9]$/.test(e.key)) pressKey(e.key);
+    else if(e.key === 'Backspace') pressKey('del');
+    else if(e.key === 'Enter'){ e.preventDefault(); pressKey('ok'); }
+  });
+
+  function checkTyped(){
+    if(typed === ''){
+      feedback.textContent = 'Впиши відповідь';
+      feedback.className = 'feedback bad';
+      return;
+    }
+    locked = true;
+    keys.forEach(k=>k.disabled=true);
+    const q = questions[currentIndex];
+    const chosen = parseInt(typed,10);
+    let delay = 900;
+    if(chosen === q.correct){
+      answerDisplay.className = 'answer-display ok';
+      feedback.textContent = 'Правильно! 🎉';
+      feedback.className = 'feedback ok';
+      score++;
+    } else {
+      answerDisplay.className = 'answer-display bad';
+      feedback.textContent = `Неправильно. Відповідь: ${q.correct}`;
+      feedback.className = 'feedback bad';
+      mistakes.push(`${q.text.replace('?', q.correct)} (твоя відповідь: ${chosen})`);
+      delay = 1800;
+    }
+    quizScoreText.textContent = `✅ ${score}`;
+    setTimeout(()=>{
+      currentIndex++;
+      if(currentIndex >= questions.length) finishQuiz();
+      else renderQuestion();
+    }, delay);
+  }
+
+  function finishQuiz(){
+    progressFill.style.width = '100%';
+    showScreen('resultScreen');
+    const total = questions.length;
+    document.getElementById('resultScore').textContent = `${score} / ${total}`;
+
+    const pct = score/total;
+    let emoji, sub;
+    if(pct === 1){ emoji='🏆'; sub='Ідеально! Жодної помилки!'; }
+    else if(pct >= 0.8){ emoji='🎉'; sub='Чудовий результат!'; }
+    else if(pct >= 0.5){ emoji='👍'; sub='Непогано, продовжуй тренуватись!'; }
+    else { emoji='💪'; sub='Потрібно ще потренуватись, спробуй ще раз!'; }
+    document.getElementById('resultEmoji').textContent = emoji;
+    document.getElementById('resultSub').textContent = sub;
+
+    const mistakesBox = document.getElementById('mistakesBox');
+    if(mistakes.length > 0){
+      mistakesBox.style.display = 'block';
+      mistakesBox.innerHTML = '<strong style="font-size:13px;color:#8b87a3;">Помилки:</strong>' +
+        mistakes.map(m=>`<div>${m}</div>`).join('');
+    } else {
+      mistakesBox.style.display = 'none';
+    }
+  }
+})();
+</script>
+</body>
+</html>
