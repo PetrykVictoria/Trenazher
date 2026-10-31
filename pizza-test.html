@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Піца шефа Ремі — тест</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍕</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#FFF5D6; --card:#FFFFFF; --ink:#2E2420; --muted:#7B6A5C; --line:#EADBB8;
+  --tomato:#E8432E; --basil:#3F8F3A; --plum:#6B3FA0;
+  --ok-bg:#E2F3DD; --ok-ink:#25661F; --bad-bg:#FCE1DB; --bad-ink:#B12E1B;
+  --check:#E8432E; --check-bg:#FFFFFF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#1E1914; --card:#2A231C; --ink:#F7ECDD; --muted:#C2AE98; --line:#46392C;
+    --ok-bg:#20391C; --ok-ink:#9BDB8F; --bad-bg:#43211A; --bad-ink:#FF9E8A;
+    --check:#B8392A; --check-bg:#2A231C;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#1E1914; --card:#2A231C; --ink:#F7ECDD; --muted:#C2AE98; --line:#46392C;
+  --ok-bg:#20391C; --ok-ink:#9BDB8F; --bad-bg:#43211A; --bad-ink:#FF9E8A;
+  --check:#B8392A; --check-bg:#2A231C;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--plum);outline-offset:2px}
+h1,h2,h3{font-family:"Rubik","Nunito",system-ui,sans-serif;margin:0;line-height:1.15}
+
+.cloth{height:22px;background-color:var(--check-bg);
+  background-image:linear-gradient(90deg,color-mix(in srgb,var(--check) 55%,transparent) 50%,transparent 50%),
+                   linear-gradient(color-mix(in srgb,var(--check) 55%,transparent) 50%,transparent 50%);
+  background-size:22px 22px;border-bottom:3px solid var(--check)}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 48px}
+
+/* Піца — головний елемент */
+.pizza{position:relative;width:min(80vw,280px);aspect-ratio:1;margin:6px auto 14px;border-radius:50%;font-size:clamp(19px,6.2vw,27px);
+  background:
+    radial-gradient(circle at 30% 38%,#FFE79A 0 7%,transparent 8%),
+    radial-gradient(circle at 66% 30%,#FFE79A 0 6%,transparent 7%),
+    radial-gradient(circle at 58% 70%,#FFE79A 0 8%,transparent 9%),
+    radial-gradient(circle at 34% 68%,#FFE79A 0 5%,transparent 6%),
+    repeating-conic-gradient(from 11deg,rgba(150,80,20,.35) 0deg 1deg,transparent 1deg 45deg),
+    radial-gradient(circle closest-side,#FFCF57 0 74%,#E2512E 75% 83%,#D8923F 84% 96%,#B9732C 97% 100%);
+  box-shadow:0 6px 0 rgba(120,70,20,.18)}
+.pizza.small{width:min(52vw,180px);font-size:clamp(13px,4.2vw,18px)}
+.sl{position:absolute;transform:translate(-50%,-50%);line-height:1}
+.sl.now{width:1.1em;height:1.1em;border-radius:50%;border:3px dashed #7A3B12}
+.sl.got{animation:drop .45s ease-out}
+@keyframes drop{from{transform:translate(-50%,-160%) scale(1.3);opacity:0}to{transform:translate(-50%,-50%);opacity:1}}
+.salami{display:block;width:1.05em;height:1.05em;border-radius:50%;border:.08em solid #8E1F17;
+  background:radial-gradient(circle at 30% 35%,#F4A893 0 9%,transparent 11%),radial-gradient(circle at 66% 58%,#F4A893 0 8%,transparent 10%),
+             radial-gradient(circle at 42% 74%,#F4A893 0 7%,transparent 9%),radial-gradient(circle at 70% 28%,#F4A893 0 6%,transparent 8%),#BE3123}
+
+.hero{text-align:center;margin-bottom:14px}
+.hero h1{font-size:29px;font-weight:800}
+.hero p{margin:6px 0 0;color:var(--muted);font-weight:700}
+.card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px}
+label.lbl{display:block;font-weight:800;margin-bottom:6px}
+.inp{width:100%;border:2px solid var(--line);border-radius:12px;padding:11px 12px;background:var(--bg);font-weight:700}
+.big{display:block;width:100%;border:none;border-radius:14px;padding:15px;margin-top:12px;font-family:"Rubik",sans-serif;
+  font-weight:700;font-size:18px;color:#fff;background:var(--tomato);border-bottom:4px solid color-mix(in srgb,var(--tomato) 70%,#000)}
+.big.alt{background:var(--basil);border-bottom-color:color-mix(in srgb,var(--basil) 70%,#000)}
+.big.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line);border-bottom-width:4px}
+.note{font-size:14px;color:var(--muted);font-weight:600;margin-top:10px}
+
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.back{background:none;border:2px solid var(--line);border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px}
+.count{font-weight:800;color:var(--muted);font-size:15px}
+.qcard{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px 16px;font-size:20px;font-weight:700;text-align:center}
+.qcard .katex{font-size:1.18em}
+.qcard svg{display:block;margin:10px auto 0;max-width:100%;height:auto;color:var(--ink)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.opt{min-height:66px;background:var(--card);border:2px solid var(--line);border-bottom-width:5px;border-radius:14px;
+  padding:10px 8px;font-size:20px;font-weight:800;display:grid;place-items:center}
+.opt.wide{font-size:16px}
+.opt .katex{font-size:1.15em}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--ok-bg);border-color:var(--basil);color:var(--ok-ink)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--tomato);color:var(--bad-ink)}
+.opt.dim{opacity:.45}
+.fb{margin-top:14px;border-radius:16px;padding:14px;border:2px solid}
+.fb.ok{background:var(--ok-bg);border-color:var(--basil)}
+.fb.bad{background:var(--bad-bg);border-color:var(--tomato)}
+.fb b{font-family:"Rubik",sans-serif;font-size:19px}
+.fb p{margin:6px 0 0;font-size:16px;font-weight:700}
+.fb p.rule{font-weight:600;color:var(--muted)}
+
+.res{text-align:center}
+.res h2{font-size:27px}
+.rank{font-family:"Rubik",sans-serif;font-weight:800;font-size:21px;margin-top:6px}
+.topics{text-align:left;margin:14px 0 0;padding:0;list-style:none}
+.topics li{display:flex;justify-content:space-between;gap:10px;padding:8px 2px;border-bottom:1px dashed var(--line);font-weight:700}
+.topics li span:last-child{white-space:nowrap}
+.topics .weak{color:var(--bad-ink)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+@media (max-width:350px){.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="cloth" aria-hidden="true"></div>
+<main class="wrap" id="app"></main>
+
+<script>
+/* ===== НАЛАШТУВАННЯ ВЧИТЕЛЯ =====
+   Встав між лапками посилання на вебдодаток Google Apps Script (закінчується на /exec). */
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwN6irYBfd0Mkrj27BDMZhCJ6XlM6l2WHeDsm7Y7cIrO6jJK2F10oyDABCfKV90xb06/exec";
+
+/* ===== ПИТАННЯ =====
+   a — правильна відповідь; w — неправильні варіанти з коментарем до помилки; h — правило */
+const R = {
+  pd:"Відсотки → десятковий дріб: ділимо на $100$, тобто кома зсувається на $2$ знаки вліво.",
+  dp:"Десятковий дріб → відсотки: множимо на $100$, тобто кома зсувається на $2$ знаки вправо.",
+  mul:"Мішані числа спершу переводимо в неправильні дроби, потім множимо чисельник на чисельник, знаменник на знаменник.",
+  div:"Мішані числа переводимо в неправильні дроби, потім ділене множимо на дріб, обернений до дільника.",
+  prop:"Добуток крайніх членів дорівнює добутку середніх: множимо навхрест, а потім ділимо.",
+  pn:"Відсоток від числа: переводимо відсотки в десятковий дріб і множимо на нього число.",
+  np:"Число за відсотком: переводимо відсотки в десятковий дріб і ділимо на нього дану частину."
+};
+const PERP_SVG = `<svg viewBox="0 0 200 150" width="190" aria-label="Прямі a і b">
+<g transform="rotate(-20 100 75)">
+<line x1="20" y1="75" x2="180" y2="75" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+<line x1="100" y1="5" x2="100" y2="145" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+<path d="M100 61 H114 V75" fill="none" stroke="#E8432E" stroke-width="2.5"/></g>
+<text x="178" y="44" font-size="20" font-style="italic" font-weight="700" fill="currentColor" font-family="Georgia,serif">a</text>
+<text x="58" y="20" font-size="20" font-style="italic" font-weight="700" fill="currentColor" font-family="Georgia,serif">b</text></svg>`;
+const PAR_SVG = `<svg viewBox="0 0 200 130" width="190" aria-label="Прямі a і b">
+<line x1="15" y1="52" x2="175" y2="28" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+<line x1="15" y1="112" x2="175" y2="88" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+<text x="180" y="32" font-size="20" font-style="italic" font-weight="700" fill="currentColor" font-family="Georgia,serif">a</text>
+<text x="180" y="92" font-size="20" font-style="italic" font-weight="700" fill="currentColor" font-family="Georgia,serif">b</text></svg>`;
+const STRIP = "Знак $\\%$ не можна просто стерти: відсотки — це соті частини, тому ділимо на $100$.";
+const ADD = "Мало просто дописати знак $\\%$: спершу помнож дріб на $100$.";
+
+const QS = [
+ {t:"Переведення %",q:"Запиши $45\\,\\%$ десятковим дробом",a:"$0{,}45$",h:R.pd,w:[
+   ["$4{,}5$","Ти поділила на $10$, а треба на $100$: кома зсувається на два знаки, а не на один."],
+   ["$45$",STRIP],
+   ["$0{,}045$","Кому зсунуто на три знаки, а треба на два."]]},
+ {t:"Переведення %",q:"Запиши $7\\,\\%$ десятковим дробом",a:"$0{,}07$",h:R.pd,w:[
+   ["$0{,}7$","$0{,}7$ — це $70\\,\\%$. А $7\\,\\%$ — сім сотих, тож після коми мають бути дві цифри."],
+   ["$7$",STRIP],
+   ["$0{,}007$","Кому зсунуто на три знаки, а треба на два."]]},
+ {t:"Переведення %",q:"Запиши $120\\,\\%$ десятковим дробом",a:"$1{,}2$",h:R.pd,w:[
+   ["$12$","Ти поділила на $10$, а треба на $100$."],
+   ["$0{,}12$","$0{,}12$ — це лише $12\\,\\%$. А $120\\,\\%$ більше за ціле, тож відповідь має бути більшою за $1$."],
+   ["$120$",STRIP]]},
+ {t:"Переведення %",q:"Запиши $0{,}6$ у відсотках",a:"$60\\,\\%$",h:R.dp,w:[
+   ["$6\\,\\%$","Ти помножила на $10$, а треба на $100$. Допиши нуль: $0{,}6=0{,}60$."],
+   ["$0{,}6\\,\\%$",ADD],
+   ["$600\\,\\%$","Кому зсунуто на три знаки, а треба на два."]]},
+ {t:"Переведення %",q:"Запиши $0{,}08$ у відсотках",a:"$8\\,\\%$",h:R.dp,w:[
+   ["$80\\,\\%$","$0{,}08$ — це вісім сотих, а не вісім десятих. Порахуй цифри після коми."],
+   ["$0{,}8\\,\\%$","Ти помножила на $10$, а треба на $100$."],
+   ["$0{,}08\\,\\%$",ADD]]},
+ {t:"Переведення %",q:"Запиши $1{,}5$ у відсотках",a:"$150\\,\\%$",h:R.dp,w:[
+   ["$15\\,\\%$","Ти помножила на $10$, а треба на $100$. Допиши нуль: $1{,}5=1{,}50$."],
+   ["$1{,}5\\,\\%$",ADD],
+   ["$105\\,\\%$","$1{,}5$ — це одна ціла п’ять десятих, тобто $1{,}50$, а не $1{,}05$."]]},
+
+ {t:"Дроби",q:"Скороти дріб $\\dfrac{15}{25}$",a:"$\\dfrac{3}{5}$",h:"Скорочуючи, ділимо і чисельник, і знаменник на одне й те саме число.",w:[
+   ["$\\dfrac{3}{25}$","Поділено лише чисельник. Знаменник теж треба поділити на те саме число."],
+   ["$\\dfrac{15}{5}$","Поділено лише знаменник. Чисельник теж треба поділити на те саме число."],
+   ["$\\dfrac{5}{3}$","Чисельник і знаменник помінялися місцями — дріб «перевернувся»."]]},
+ {t:"Дроби",q:"Запиши $3\\dfrac{2}{5}$ неправильним дробом",a:"$\\dfrac{17}{5}$",h:"Новий чисельник: ціле $\\cdot$ знаменник $+$ чисельник. Знаменник не змінюється.",w:[
+   ["$\\dfrac{32}{5}$","Цифри $3$ і $2$ просто записано поруч, а треба обчислити: ціле $\\cdot$ знаменник $+$ чисельник."],
+   ["$\\dfrac{6}{5}$","Ціле помножено на чисельник ($3\\cdot2$), а треба на знаменник."],
+   ["$\\dfrac{15}{5}$","Ціле на знаменник помножено правильно, але забуто додати чисельник."]]},
+ {t:"Дроби",q:"Виділи цілу частину: $\\dfrac{23}{4}$",a:"$5\\dfrac{3}{4}$",h:"Ділимо чисельник на знаменник з остачею: частка — ціла частина, остача — новий чисельник, знаменник той самий.",w:[
+   ["$3\\dfrac{5}{4}$","Частку й остачу переплутано: ціла частина — це частка від ділення $23:4$, а остача йде в чисельник."],
+   ["$5\\dfrac{3}{23}$","Знаменник не змінюється — він залишається $4$."],
+   ["$4\\dfrac{7}{4}$","Цілу частину виділено не до кінця: дріб $\\dfrac{7}{4}$ ще більший за $1$."]]},
+ {t:"Дроби",q:"$2\\dfrac{1}{3}+1\\dfrac{1}{2}=$",a:"$3\\dfrac{5}{6}$",h:"Цілі додаємо до цілих, а дроби спершу зводимо до спільного знаменника.",w:[
+   ["$3\\dfrac{2}{5}$","Чисельники й знаменники додано окремо. Так не можна: спершу зведи дроби до знаменника $6$."],
+   ["$3\\dfrac{2}{6}$","Знаменник змінено на $6$, але чисельники не домножено на додаткові множники."],
+   ["$2\\dfrac{5}{6}$","Дроби додано правильно, але цілі частини теж треба додати: $2+1$."]]},
+ {t:"Дроби",q:"$1\\dfrac{1}{2}\\cdot2\\dfrac{2}{3}=$",a:"$4$",h:R.mul,w:[
+   ["$2\\dfrac{1}{3}$","Цілі й дроби перемножено окремо. Так не можна: спершу переведи мішані числа в неправильні дроби."],
+   ["$4\\dfrac{1}{6}$","Числа додано, а треба помножити."],
+   ["$\\dfrac{9}{16}$","Другий дріб перевернуто, як при діленні. При множенні дроби не перевертаємо."]]},
+ {t:"Дроби",q:"$3\\dfrac{1}{3}:1\\dfrac{1}{4}=$",a:"$2\\dfrac{2}{3}$",h:R.div,w:[
+   ["$4\\dfrac{1}{3}$","Цілі й дроби поділено окремо. Так не можна: спершу переведи мішані числа в неправильні дроби."],
+   ["$4\\dfrac{1}{6}$","Дроби перемножено, але дільник не перевернуто. При діленні множимо на обернений дріб."],
+   ["$\\dfrac{3}{8}$","Перевернуто не той дріб. Перевертаємо дільник — число, яке стоїть після знака ділення."]]},
+
+ {t:"Пропорції",q:"Знайди $x$: $\\dfrac{x}{6}=\\dfrac{4}{8}$",a:"$x=3$",h:R.prop,w:[
+   ["$x=12$","Помножено не ті числа. Навхрест: $x\\cdot8=6\\cdot4$."],
+   ["$x=24$","$6\\cdot4=24$ — це лише добуток середніх. Щоб знайти $x$, його ще треба поділити на $8$."],
+   ["$x=2$","У пропорції числа не віднімають, а множать навхрест."]]},
+ {t:"Пропорції",q:"Знайди $x$: $\\dfrac{0{,}4}{x}=\\dfrac{2}{5}$",a:"$x=1$",h:R.prop,w:[
+   ["$x=0{,}16$","Помножено не ті числа. Навхрест: $x\\cdot2=0{,}4\\cdot5$."],
+   ["$x=2$","$0{,}4\\cdot5=2$ — це лише добуток крайніх. Щоб знайти $x$, його ще треба поділити на $2$."],
+   ["$x=10$","Перевір множення: $0{,}4\\cdot5=2$, а не $20$."]]},
+
+ {t:"Відсоток від числа",q:"Знайди $25\\,\\%$ від $160$",a:"$40$",h:R.pn,w:[
+   ["$4000$","Число помножено на $25$, а треба на $0{,}25$: спершу переведи відсотки в десятковий дріб."],
+   ["$640$","Число поділено на $0{,}25$. Щоб знайти відсоток від числа, множимо, а не ділимо."],
+   ["$4$","$25\\,\\%=0{,}25$, а не $0{,}025$: кома зсувається на два знаки."]]},
+ {t:"Відсоток від числа",q:"Знайди $8\\,\\%$ від $50$",a:"$4$",h:R.pn,w:[
+   ["$40$","$8\\,\\%=0{,}08$, а не $0{,}8$."],
+   ["$400$","Число помножено на $8$, а треба на $0{,}08$: спершу переведи відсотки в десятковий дріб."],
+   ["$625$","Число поділено на $0{,}08$. Щоб знайти відсоток від числа, множимо, а не ділимо."]]},
+
+ {t:"Число за відсотком",q:"$20\\,\\%$ числа дорівнюють $14$. Знайди число",a:"$70$",h:R.np,w:[
+   ["$2{,}8$","Це $20\\,\\%$ від $14$. Але $14$ — це вже частина, а шукаємо все число, тому ділимо."],
+   ["$280$","$14$ помножено на $20$. Щоб знайти все число, частину ділимо на $0{,}2$."],
+   ["$7$","$20\\,\\%=0{,}2$, а не $2$."]]},
+ {t:"Число за відсотком",q:"$60\\,\\%$ числа дорівнюють $42$. Знайди число",a:"$70$",h:R.np,w:[
+   ["$25{,}2$","Це $60\\,\\%$ від $42$. Але $42$ — це вже частина, а шукаємо все число, тому ділимо."],
+   ["$7$","$60\\,\\%=0{,}6$, а не $6$."],
+   ["$700$","$60\\,\\%=0{,}6$, а не $0{,}06$: кома зсувається на два знаки."]]},
+
+ {t:"Задача на знижку",q:"Сковорідка коштувала $300$ грн. Знижка $15\\,\\%$. Скільки вона коштує тепер?",a:"$255$ грн",
+  h:"Спершу знаходимо знижку в гривнях, потім віднімаємо її від початкової ціни.",w:[
+   ["$45$ грн","$45$ грн — це сама знижка. Щоб дізнатися нову ціну, відніми її від $300$."],
+   ["$285$ грн","Від ціни віднято $15$ гривень, а знижка — це $15\\,\\%$ від $300$ гривень."],
+   ["$345$ грн","Знижку додано, а її треба відняти: після знижки ціна менша."]]},
+
+ {t:"Кути і прямі",q:"Один із суміжних кутів дорівнює $65^\\circ$. Знайди другий кут",a:"$115^\\circ$",h:"Сума суміжних кутів дорівнює $180^\\circ$.",w:[
+   ["$25^\\circ$","Ти відняла від $90^\\circ$, а сума суміжних кутів — $180^\\circ$."],
+   ["$65^\\circ$","Рівні між собою вертикальні кути. Суміжні кути в сумі дають $180^\\circ$."],
+   ["$295^\\circ$","Ти відняла від $360^\\circ$, а сума суміжних кутів — $180^\\circ$."]]},
+ {t:"Кути і прямі",q:"Один із вертикальних кутів дорівнює $48^\\circ$. Знайди другий кут",a:"$48^\\circ$",h:"Вертикальні кути рівні між собою.",w:[
+   ["$132^\\circ$","$180^\\circ-48^\\circ$ — так шукають суміжний кут. А вертикальні кути рівні."],
+   ["$42^\\circ$","Від $90^\\circ$ віднімати не потрібно: вертикальні кути рівні."],
+   ["$96^\\circ$","Вертикальні кути рівні, а не вдвічі більші."]]},
+ {t:"Кути і прямі",q:"Як розташовані прямі $a$ і $b$ на рисунку?",img:PERP_SVG,wide:true,a:"перпендикулярні",
+  h:"Червона позначка біля точки перетину показує прямий кут ($90^\\circ$).",w:[
+   ["паралельні","Паралельні прямі не перетинаються, а ці мають спільну точку."],
+   ["не перетинаються","Подивись уважно: прямі перетинаються в одній точці."],
+   ["вертикальні","Вертикальними бувають кути, а не прямі."]]},
+ {t:"Кути і прямі",q:"Прямі $a$ і $b$ перпендикулярні. Під яким кутом вони перетинаються?",a:"$90^\\circ$",h:"Перпендикулярні прямі утворюють прямий кут.",w:[
+   ["$180^\\circ$","$180^\\circ$ — це розгорнутий кут. Перпендикулярні прямі утворюють прямий кут."],
+   ["$45^\\circ$","$45^\\circ$ — це лише половина прямого кута."],
+   ["$60^\\circ$","Перпендикулярні прямі утворюють прямий кут. Згадай, скільки в ньому градусів."]]},
+ {t:"Кути і прямі",q:"Як розташовані прямі $a$ і $b$ на рисунку?",img:PAR_SVG,wide:true,a:"паралельні",
+  h:"Прямі на площині, які не перетинаються, називають паралельними: $a\\parallel b$.",w:[
+   ["перпендикулярні","Перпендикулярні прямі перетинаються під прямим кутом, а ці не мають спільної точки."],
+   ["перетинаються","Скільки б ми не продовжували ці прямі, вони не зустрінуться."],
+   ["вертикальні","Вертикальними бувають кути, а не прямі."]]}
+];
+
+/* ===== Начинки ===== */
+const TOP = [["salami","ковбаска"],["🍅","помідор"],["🧀","сир"],["🫑","перець"],["salami","ковбаска"],["🥓","бекон"],["🌿","базилік"],["🌽","кукурудза"]];
+const N = QS.length;
+const app = document.getElementById("app");
+
+function lsGet(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+let DEVICE = lsGet("pz-device",null);
+if(!DEVICE){ DEVICE = "D"+Math.random().toString(36).slice(2,7).toUpperCase(); lsSet("pz-device",DEVICE); }
+let NAME = lsGet("pz-name","");
+let ATTEMPTS = lsGet("pz-attempts",0);
+
+function plain(s){
+  return String(s).replace(/(\d)\\dfrac/g,"$1 \\dfrac").replace(/\\dfrac\{([^}]*)\}\{([^}]*)\}/g,"$1/$2")
+    .replace(/\\,\\%/g," %").replace(/\{,\}/g,",").replace(/\^\\circ/g,"°").replace(/\\cdot/g,"·").replace(/\$/g,"");
+}
+function log(ev){
+  const row = Object.assign({time:new Date().toLocaleString("uk-UA"),name:NAME,device:DEVICE},ev);
+  if(SHEET_URL){
+    try{ fetch(SHEET_URL,{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(row)}).catch(()=>{}); }catch(e){}
+  }
+}
+function math(el){ if(window.renderMathInElement){ try{ renderMathInElement(el,{delimiters:[{left:"$",right:"$",display:false}],throwOnError:false}); }catch(e){} } }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* Розкладка начинок: зовнішнє коло, середнє, внутрішнє, центр */
+const POS = (()=>{ const p=[]; let left=N;
+  for(const [cap,r,off] of [[13,30,0],[8,18,.4],[4,7,.8],[1,0,0]]){
+    const c=Math.min(cap,left); if(c<=0) break;
+    for(let k=0;k<c;k++){ const a=-Math.PI/2+off+k*2*Math.PI/c; p.push([50+r*Math.cos(a),50+r*Math.sin(a)]); }
+    left-=c; }
+  return p; })();
+function topHTML(k){ const t=TOP[k%TOP.length][0]; return t==="salami"?'<span class="salami"></span>':t; }
+function pizzaHTML(res,cur,small,animIdx){
+  return `<div class="pizza${small?" small":""}" aria-label="Начинок на піці: ${res.filter(Boolean).length} з ${N}">`+
+    POS.map(([x,y],k)=>{
+      const st=`left:${x}%;top:${y}%`;
+      if(k<res.length && res[k]) return `<span class="sl${k===animIdx?" got":""}" style="${st}">${topHTML(k)}</span>`;
+      if(k===cur) return `<span class="sl now" style="${st}"></span>`;
+      return "";
+    }).join("")+`</div>`;
+}
+
+/* ===== Головна ===== */
+function home(){
+  app.innerHTML = `
+  <section class="hero">
+    ${pizzaHTML(Array(N).fill(true),-1,true)}
+    <h1>Піца шефа Ремі</h1>
+    <p>Кожна правильна відповідь — начинка на піцу: ковбаска, сир, овочі. Збери всі ${N}!</p>
+  </section>
+  <div class="card">
+    <label class="lbl" for="nm">Твоє ім’я</label>
+    <input class="inp" id="nm" autocomplete="given-name" value="${esc(NAME)}" placeholder="Наприклад, Соломія">
+    <button class="big" id="go">Почати тест</button>
+    ${ATTEMPTS?`<p class="note">Спроб на цьому пристрої: ${ATTEMPTS}</p>`:""}
+  </div>`;
+  const nm=document.getElementById("nm");
+  document.getElementById("go").onclick=()=>{
+    NAME=nm.value.trim(); lsSet("pz-name",NAME);
+    if(!NAME){ nm.focus(); nm.placeholder="Спершу впиши ім’я"; return; }
+    startTest();
+  };
+  window.scrollTo(0,0);
+}
+
+/* ===== Тест ===== */
+let S=null;
+function startTest(){
+  ATTEMPTS++; lsSet("pz-attempts",ATTEMPTS);
+  S={attempt:ATTEMPTS, i:0, res:[], t0:Date.now()};
+  log({event:"Почала тест",attempt:S.attempt});
+  showQ(-1);
+}
+function showQ(animIdx){
+  const q=QS[S.i];
+  const opts=shuffle([{t:q.a,ok:true}].concat(q.w.map(([t,c])=>({t,c,ok:false}))));
+  app.innerHTML=`
+  <div class="bar"><button class="back" id="back">← Вийти</button><span class="count">Питання ${S.i+1} з ${N}</span></div>
+  ${pizzaHTML(S.res,S.i,false,animIdx)}
+  <div class="qcard">${q.q}${q.img||""}</div>
+  <div class="opts">${opts.map((o,k)=>`<button class="opt${q.wide?" wide":""}" data-k="${k}">${o.t}</button>`).join("")}</div>
+  <div id="fb"></div>`;
+  math(app);
+  document.getElementById("back").onclick=()=>{
+    if(confirm("Вийти з тесту? Цю спробу буде перервано.")){
+      log({event:"Перервала тест",attempt:S.attempt,q:`на питанні ${S.i+1} з ${N}`,score:`${S.res.filter(Boolean).length} з ${N}`});
+      home();
+    }
+  };
+  const t1=Date.now();
+  const btns=app.querySelectorAll(".opt");
+  btns.forEach(b=>b.onclick=()=>{
+    const ch=opts[+b.dataset.k];
+    btns.forEach(x=>{ x.disabled=true; if(x!==b) x.classList.add("dim"); });
+    b.classList.add(ch.ok?"right":"wrong");
+    S.res.push(ch.ok);
+    log({event:"Відповідь",attempt:S.attempt,num:S.i+1,q:plain(q.q),chosen:plain(ch.t),correct:plain(q.a),ok:ch.ok,sec:Math.round((Date.now()-t1)/1000)});
+    const last=S.i===N-1;
+    const fb=document.getElementById("fb");
+    fb.innerHTML = ch.ok
+      ? `<div class="fb ok" role="status"><b>${pick(["Смачно! 😋","Правильно!","Шеф задоволений!","Беліссімо! 🤌"])}</b>
+         <p>На піцу: ${TOP[S.i%TOP.length][1]} ${TOP[S.i%TOP.length][0]==="salami"?"🍕":TOP[S.i%TOP.length][0]}</p>
+         <button class="big alt" id="next">${last?"Подати піцу":"Далі"}</button></div>`
+      : `<div class="fb bad" role="status"><b>Начинка впала на підлогу 🙈</b>
+         <p>${ch.c}</p><p class="rule">Правило: ${q.h}</p>
+         <button class="big" id="next">${last?"Подати піцу":"Далі"}</button></div>`;
+    math(fb);
+    app.querySelector(".pizza").outerHTML=pizzaHTML(S.res,last?-1:S.i+1,false,ch.ok?S.i:-1);
+    document.getElementById("next").onclick=()=>{ if(last) result(); else { S.i++; showQ(-1); } };
+    fb.scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+  window.scrollTo(0,0);
+}
+
+function rankOf(sc){
+  const p=sc/N;
+  if(p>=0.9) return ["Піцайоло-маестро 🏆","Ідеальна піца! Ремі пишається тобою."];
+  if(p>=0.75) return ["Су-шеф ⭐","Смачна піца, але кількох начинок бракує."];
+  if(p>=0.5) return ["Кухар 🍳","Піца вийшла напівпорожня. Повтори правила й спробуй ще раз."];
+  return ["Помічник кухаря 🧽","На піці майже немає начинки. Перечитай правила й спробуй знову."];
+}
+function result(){
+  const sc=S.res.filter(Boolean).length, [rank,msg]=rankOf(sc);
+  const mins=Math.max(1,Math.round((Date.now()-S.t0)/60000));
+  log({event:"Завершила тест",attempt:S.attempt,score:`${sc} з ${N}`,sec:Math.round((Date.now()-S.t0)/1000)});
+  const tops={}; QS.forEach((q,k)=>{ tops[q.t]=tops[q.t]||[0,0]; tops[q.t][1]++; if(S.res[k]) tops[q.t][0]++; });
+  app.innerHTML=`
+  <section class="res">
+    ${pizzaHTML(S.res,-1,false)}
+    <h2>${sc} з ${N}</h2>
+    <div class="rank">${rank}</div>
+    <p style="font-weight:700;margin:6px 0 0">${msg}</p>
+    <p class="note">Спроба №${S.attempt}, час: ~${mins} хв</p>
+  </section>
+  <div class="card" style="margin-top:14px">
+    <h3>Результат за темами</h3>
+    <ul class="topics">${Object.entries(tops).map(([t,[a,b]])=>`<li class="${a<b?"weak":""}"><span>${t}</span><span>${a} з ${b}</span></li>`).join("")}</ul>
+  </div>
+  <button class="big alt" id="again">Пройти тест ще раз</button>
+  <button class="big ghost" id="home">На головну</button>`;
+  document.getElementById("again").onclick=startTest;
+  document.getElementById("home").onclick=home;
+  window.scrollTo(0,0);
+}
+
+home();
+</script>
+</body>
+</html>
