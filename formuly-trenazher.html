@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Формули скороченого множення — тренажер</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+:root{
+  --paper:#F6F9FD;--grid:#E0E9F5;--card:#FFFFFF;--ink:#18223B;--muted:#5A6680;--line:#CBD7E7;
+  --sum:#2F52D0;--diff:#A532BA;--dsq:#C86A06;--none:#687087;
+  --ok:#2B8A3E;--okbg:#E7F6EA;--bad:#E03131;--badbg:#FDECEC;--mark:#FFE16A;--markink:#18223B;
+  color-scheme:light;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#111827;--grid:#1B2435;--card:#18213A;--ink:#E8EDF7;--muted:#9AA6BF;--line:#2E3A55;
+  --sum:#8AA2FF;--diff:#E38AF2;--dsq:#FFAE57;--none:#A0A8BA;--ok:#5AD27A;--okbg:#15301F;--bad:#FF7070;--badbg:#3A1C22;color-scheme:dark}
+}
+*,*::before,*::after{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;font-family:Rubik,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.5;color:var(--ink);
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+.wrap{max-width:620px;margin:0 auto;padding:20px 16px 48px}
+h1{font-family:Unbounded,Rubik,sans-serif;font-weight:700;font-size:clamp(25px,6.6vw,36px);line-height:1.15;margin:8px 0 10px;letter-spacing:-.01em}
+h2{font-family:Unbounded,Rubik,sans-serif;font-weight:500;font-size:19px;margin:24px 0 10px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:46ch}
+:focus-visible{outline:3px solid var(--sum);outline-offset:2px}
+
+.fcards{display:grid;gap:10px}
+.fcard{background:var(--card);border:1px solid var(--line);border-left:7px solid var(--fc);border-radius:6px 14px 14px 6px;padding:10px 14px;overflow-x:auto}
+.fcard .fname{display:block;font-weight:600;color:var(--fc);font-size:15px}
+.fcard .katex-display{margin:4px 0}
+.fcard .katex-display>.katex{text-align:left;font-size:1.25em}
+.f-sum{--fc:var(--sum)}.f-diff{--fc:var(--diff)}.f-dsq{--fc:var(--dsq)}.f-none{--fc:var(--none)}
+.mid{background:var(--mark);color:var(--markink);border-radius:4px;padding:0 3px}
+.blank{color:var(--sum)}
+.memo{margin:12px 0 0;padding:0 0 0 18px;color:var(--muted);font-size:15px}
+.memo li{margin:4px 0}
+
+.namebox{display:block;margin:24px 0 4px;font-weight:500}
+.namebox input{display:block;width:100%;margin-top:6px;font:inherit;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)}
+.namebox input.err{border-color:var(--bad)}
+.err-msg{color:var(--bad);font-size:15px;min-height:1.4em;margin:0}
+.route{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lvl{width:100%;display:flex;align-items:center;gap:14px;text-align:left;font:inherit;color:inherit;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer}
+.lvl:hover,.lvl.pending{border-color:var(--ink)}
+.lvl .num{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:Unbounded,Rubik,sans-serif;font-weight:700;background:var(--ink);color:var(--paper)}
+.lvl.exam .num{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.lvl b{display:block;font-weight:600}
+.lvl small{display:block;color:var(--muted);font-size:14px;line-height:1.35}
+.lvl .st{margin-left:auto;flex:none;letter-spacing:2px;color:var(--dsq)}
+
+.topbar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.topbar .lt{flex:1;text-align:center;font-weight:600;font-size:15px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ghost{font:inherit;font-size:15px;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:10px;padding:8px 12px;min-height:44px;cursor:pointer}
+.ghost:hover{border-color:var(--ink)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);transition:width .3s}
+.count{font-size:14px;color:var(--muted);margin:8px 0 12px}
+.rep{display:inline-block;margin-left:8px;padding:0 8px;border-radius:8px;background:var(--mark);color:var(--markink);font-size:13px}
+.task{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+.label{font-size:14px;color:var(--muted)}
+.expr{overflow-x:auto;overflow-y:hidden;font-size:1.2em}
+.expr .katex-display{margin:.35em 0}
+.q{font-weight:500;margin:10px 0}
+.how{font-size:15px;color:var(--muted);margin:-4px 0 12px;line-height:1.5}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{font:inherit;color:inherit;display:flex;align-items:center;gap:10px;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 12px;min-height:56px;cursor:pointer;overflow-x:auto}
+.opt:not(:disabled):hover{border-color:var(--ink)}
+.opt:disabled{cursor:default}
+.opt .katex{font-size:1.1em}
+.opt.f{border-left:8px solid var(--fc);flex-direction:column;align-items:flex-start;justify-content:center;gap:0}
+.opt.f b{color:var(--fc);font-weight:600;font-size:15px}
+.opt.f>span{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:14px;row-gap:2px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt.sel{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.let{flex:none;width:28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:600;font-size:15px;border:2px solid var(--line)}
+.opt.sel .let{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.fb{margin-top:14px;padding:12px 14px;border-radius:12px;line-height:1.6;overflow-x:auto;background:var(--paper)}
+.fb.ok{background:var(--okbg)}
+.fb.bad{background:var(--badbg)}
+.fb b{margin-right:4px}
+.act{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.main{font:inherit;font-weight:600;background:var(--ink);color:var(--paper);border:none;border-radius:12px;padding:12px 20px;min-height:48px;cursor:pointer}
+
+.scaf{border-left:6px solid var(--fc);padding:4px 0 4px 12px;margin:6px 0 4px;overflow-x:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{padding:2px 10px;border-radius:20px;border:1px solid var(--line);color:var(--muted);font-size:15px}
+.chip.on{color:var(--ink);border-color:var(--fc)}
+
+.ansbox{min-height:60px;border:2px dashed var(--line);border-radius:14px;padding:8px 12px;display:flex;align-items:center;overflow-x:auto;margin-bottom:12px}
+.ansbox .ph{color:var(--muted);font-size:15px}
+.tiles{display:flex;flex-wrap:wrap;gap:8px}
+.tile{font:inherit;color:inherit;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:8px 14px;min-height:48px;min-width:64px;cursor:pointer}
+.tile .katex{font-size:1.1em}
+.tile.used{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tile.ok{border-color:var(--ok);background:var(--okbg);color:var(--ink)}
+.tile.bad{border-color:var(--bad);background:var(--badbg);color:var(--ink)}
+.tile.miss{border-color:var(--ok);border-style:dashed}
+
+.mcols{display:grid;gap:8px;margin:6px 0 10px}
+.mc{display:flex;align-items:center;gap:10px;overflow-x:auto}
+.mr{border-top:1px solid var(--line);padding:10px 0}
+.mrq{display:flex;align-items:center;gap:10px;overflow-x:auto}
+.no{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:14px;background:var(--ink);color:var(--paper)}
+.mbtns{display:flex;gap:6px;margin-top:8px}
+.mbtns button{flex:1;font:inherit;font-weight:600;min-height:44px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);cursor:pointer}
+.mbtns button.sel{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+.score{font-family:Unbounded,Rubik,sans-serif;font-weight:700;font-size:52px;line-height:1.1;margin-top:18px}
+.score span{font-size:22px;font-weight:500;color:var(--muted)}
+.bigstars{font-size:30px;letter-spacing:4px;color:var(--dsq)}
+.review{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.review li{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--bad);border-radius:6px 12px 12px 6px;padding:10px 12px;overflow-x:auto}
+.review li.ok{border-left-color:var(--ok)}
+.review .ra{font-size:15px;color:var(--muted);margin-top:4px}
+
+.overlay{position:fixed;inset:0;background:rgba(10,15,30,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20;padding:12px}
+.overlay[hidden]{display:none}
+.sheet{background:var(--paper);border-radius:18px;width:100%;max-width:620px;max-height:90vh;overflow:auto;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sheet h2{margin:0}
+@media (min-width:700px){.overlay{align-items:center}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+<script>
+// Встав сюди URL вебдодатка Apps Script (той самий, що й для інших тестів, закінчується на /exec).
+// Якщо залишити порожнім, тренажер працює без звітів.
+const SHEET_URL = "";
+
+/* ---------- математика ---------- */
+const VARS=['x','y','m','n','c','p','k','t'];
+const LET=['А','Б','В','Г','Д'];
+const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+const T=(c,v={})=>({c,v});
+const dbl=v=>{const o={};for(const k in v)o[k]=v[k]*2;return o;};
+const sq=t=>T(t.c*t.c,dbl(t.v));
+function mul(...ts){let c=1;const v={};for(const t of ts){c*=t.c;for(const k in t.v)v[k]=(v[k]||0)+t.v[k];}return T(c,v);}
+const scale=(t,k)=>T(t.c*k,{...t.v});
+const neg=t=>scale(t,-1);
+const isNum=t=>Object.keys(t.v).length===0;
+const mono=v=>Object.keys(v).sort().map(k=>v[k]===1?k:`${k}^{${v[k]}}`).join('');
+function abs(t){const c=Math.abs(t.c),m=mono(t.v);return m?(c===1?'':c)+m:String(c);}
+function paren(t){const ks=Object.keys(t.v);return isNum(t)||(t.c===1&&ks.length===1&&t.v[ks[0]]===1)?abs(t):`(${abs(t)})`;}
+const poly=ts=>ts.map((t,i)=>(i===0?(t.c<0?'-':''):(t.c<0?' - ':' + '))+abs(t)).join('');
+const tile=t=>(t.c<0?'-':'+')+abs(t);
+function coll(type,A,B,sw=false){const a=abs(A),b=abs(B);
+  if(type==='sum')return `(${a} + ${b})^2`;
+  if(type==='diff')return `(${a} - ${b})^2`;
+  return sw?`(${a} + ${b})(${a} - ${b})`:`(${a} - ${b})(${a} + ${b})`;}
+function expand(type,A,B){const a2=sq(A),b2=sq(B),m=mul(T(2),A,B);return type==='sum'?[a2,m,b2]:type==='diff'?[a2,neg(m),b2]:[a2,neg(b2)];}
+function plain(s){return s.replace(/\\htmlClass\{[^}]*\}\{([^}]*)\}/g,'$1').replace(/\\square/g,'■').replace(/\\cdot/g,'·').replace(/\\ne\b/g,'≠')
+  .replace(/\\[,;]/g,' ').replace(/\^\{(\d+)\}/g,(m,d)=>d.split('').map(x=>SUP[x]).join('')).replace(/\^(\d)/g,(m,d)=>SUP[d]).replace(/[{}$]/g,'').replace(/-/g,'−');}
+function K(tex,d=false){try{if(typeof window!=='undefined'&&window.katex)return katex.renderToString(tex,{displayMode:d,throwOnError:false,trust:true,strict:false});}catch(e){}return `<span>${plain(tex)}</span>`;}
+const tx=s=>s.replace(/\$([^$]+)\$/g,(m,t)=>K(t));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const FN={sum:'Квадрат суми',diff:'Квадрат різниці',dsq:'Різниця квадратів',none:'Не формула'};
+const FP={sum:'(a+b)^2',diff:'(a-b)^2',dsq:'a^2-b^2',none:''};
+const FULL={sum:'(a+b)^2=a^2+\\htmlClass{mid}{2ab}+b^2',diff:'(a-b)^2=a^2-\\htmlClass{mid}{2ab}+b^2',dsq:'(a-b)(a+b)=a^2-b^2'};
+const BL='\\htmlClass{blank}{\\square}';
+const NOPE='Не можна згорнути';
+
+function pair(tier){const v=pick(VARS);let A,B;
+  if(tier===1){A=T(1,{[v]:1});B=T(rnd(2,9));}
+  else if(tier===2){A=T(rnd(2,7),{[v]:1});B=T(rnd(2,9));}
+  else{const r=Math.random();
+    if(r<.5){const w=pick(VARS.filter(z=>z!==v));A=T(rnd(2,6),{[v]:1});B=T(rnd(1,5),{[w]:1});}
+    else{A=T(rnd(2,9),{[v]:1});B=T(rnd(2,12));}}
+  if(tier<3&&Math.random()<.25)[A,B]=[B,A];
+  return [A,B];}
+function mk(cor,wr,n=4){const seen=new Set([cor]),w=[];for(const x of wr){if(x&&!seen.has(x)){seen.add(x);w.push(x);}if(w.length>=n-1)break;}
+  return shuffle([cor,...w]).map(x=>({h:K(x),t:plain(x),ok:x===cor}));}
+const fOpts=(types,cor)=>types.map(f=>({h:`<b>${FN[f]}</b>${FP[f]?K(FP[f]):''}`,t:FN[f],ok:f===cor,f}));
+const txo=(s,ok)=>({h:tx(s),t:plain(s),ok});
+const basics=(type,A,B)=>({a:abs(A),b:abs(B),a2:sq(A),b2:sq(B),ab:mul(A,B),ab2:mul(T(2),A,B),ex:expand(type,A,B),s:type==='sum'?1:-1});
+
+/* Рівень 1 — розпізнавання */
+function genIdent(tier){
+  const [A,B]=pair(tier);const type=pick(['sum','diff','dsq','sum','diff','dsq','none']);
+  const {a,b,a2,b2,ab,ab2,ex}=basics(type==='none'?'sum':type,A,B);
+  let expr,note;
+  if(type==='none'){const r=rnd(1,3);
+    if(r===1){expr=poly([a2,b2]);note='Це <b>сума</b> квадратів. Формули для суми квадратів немає, на множники вона не розкладається.';}
+    else if(r===2){expr=poly([a2,scale(ab,pick([1,-1])),b2]);note=`Якщо $a = ${a}$, $b = ${b}$, то посередині мав би стояти $2ab = ${abs(ab2)}$. А тут $${abs(ab)}$ — добуток не подвоєний, тому це не квадрат двочлена.`;}
+    else{let C;do{C=T(rnd(1,9),{...B.v});}while(C.c===B.c);expr=`(${a} + ${b})(${a} - ${abs(C)})`;
+      note=`Для різниці квадратів у дужках мають стояти <b>однакові</b> доданки. Тут $${b}$ і $${abs(C)}$ різні, тож це звичайний добуток двочленів.`;}
+  }else if(Math.random()<(tier===1?.7:.5)){
+    expr=coll(type,A,B,Math.random()<.5);
+    note=type==='dsq'?`Дужки однакові, а знаки в них різні — це різниця квадратів: $(a-b)(a+b)=a^2-b^2$, де $a = ${a}$, $b = ${b}$.`
+      :`Двочлен у квадраті зі знаком «${type==='sum'?'+':'−'}» — ${FN[type].toLowerCase()} $${FP[type]}$, де $a = ${a}$, $b = ${b}$.`;
+  }else{
+    expr=poly(ex);
+    note=type==='dsq'?`Два квадрати і «−» між ними: $${abs(a2)} = ${paren(A)}^2$, $${abs(b2)} = ${paren(B)}^2$. Це різниця квадратів: $${expr} = ${coll('dsq',A,B)}$.`
+      :`Три доданки: $${abs(a2)} = ${paren(A)}^2$, $${abs(b2)} = ${paren(B)}^2$, а посередині подвоєний добуток $2\\cdot ${a}\\cdot ${b} = ${abs(ab2)}$ зі знаком «${type==='sum'?'+':'−'}». Це $${coll(type,A,B)}$.`;
+  }
+  return {type:'steps',head:expr,qtxt:plain(expr),ans:FN[type],ansH:FN[type],
+    steps:[{q:'Яка це формула?',opts:fOpts(['sum','diff','dsq','none'],type),fixed:true,note}]};
+}
+
+/* Рівень 2 — покроково */
+function genSteps(tier){
+  const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);
+  const {a,b,a2,b2,ab,ab2,ex,s}=basics(type,A,B);
+  const sw=Math.random()<.5,expr=coll(type,A,B,sw);
+  const sqW=X=>[abs(T(X.c,dbl(X.v))),abs(scale(X,2)),abs(T(X.c*X.c,X.v)),abs(X),abs(T(2*X.c,dbl(X.v))),abs(T(X.c*X.c*2,dbl(X.v))),abs(T(X.c*X.c+1,dbl(X.v)))];
+  const coefNote=X=>X.c!==1&&!isNum(X)?' До квадрата підносимо і число, і змінну.':'';
+  const steps=[
+    {q:'Яка це формула?',opts:fOpts(['sum','diff','dsq'],type),fixed:true,
+      note:type==='dsq'?'Дужки однакові, а знаки в них різні — це різниця квадратів.':`Двочлен у квадраті зі знаком «${type==='sum'?'+':'−'}» — ${FN[type].toLowerCase()}.`},
+    {q:'Знайди $a$ — перший доданок у дужках:',opts:mk(a,[b,abs(a2),mono(A.v),abs(scale(A,2)),abs(ab)]),chip:0,note:`$a$ — перший доданок у дужках: $a = ${a}$.`},
+    {q:'Знайди $b$ — другий доданок у дужках:',opts:mk(b,[a,abs(b2),mono(B.v),abs(scale(B,2)),abs(ab)]),chip:1,note:`$b$ — другий доданок у дужках: $b = ${b}$.`},
+    {q:'Піднеси $a$ до квадрата: $a^2 = ?$',opts:mk(abs(a2),sqW(A)),chip:2,note:`$a^2 = ${paren(A)}^2 = ${abs(a2)}$.${coefNote(A)}`},
+  ];
+  if(type!=='dsq')steps.push({q:'Знайди подвоєний добуток: $2ab = ?$',opts:mk(abs(ab2),[abs(ab),abs(scale(ab,4)),abs(sq(ab)),abs(scale(ab,3)),abs(mul(T(2),A))]),chip:3,
+    note:`$2ab = 2\\cdot ${a}\\cdot ${b} = ${abs(ab2)}$.`});
+  steps.push({q:'Піднеси $b$ до квадрата: $b^2 = ?$',opts:mk(abs(b2),sqW(B)),chip:type==='dsq'?3:4,note:`$b^2 = ${paren(B)}^2 = ${abs(b2)}$.${coefNote(B)}`});
+  const fw=type==='dsq'?[poly([a2,b2]),poly([a2,neg(ab2),b2]),poly([a2,ab2,b2]),poly([a2,neg(scale(B,2))])]
+    :[poly([a2,b2]),poly([a2,scale(ab,s),b2]),poly([a2,scale(ab2,-s),b2]),poly([a2,scale(ab2,s),neg(b2)])];
+  steps.push({q:'Тепер збери відповідь. Яка вона?',how:type==='dsq'?'Підстав у формулу вгорі: $a^2 - b^2$, тобто знайдені $a^2$ і $b^2$ з мінусом між ними.':`Підстав у формулу вгорі: $a^2 ${type==='sum'?'+':'-'} 2ab + b^2$, тобто три знайдені доданки.`,opts:mk(poly(ex),fw),note:`$${expr} = ${poly(ex)}$${type==='dsq'?'':'. Три доданки, посередині $2ab$'}.`});
+  const chips=[['a',a],['b',b],['a^2',abs(a2)]];if(type!=='dsq')chips.push(['2ab',abs(ab2)]);chips.push(['b^2',abs(b2)]);
+  return {type:'steps',head:expr,qtxt:plain(expr),ans:plain(poly(ex)),ansH:K(`${expr} = ${poly(ex)}`),auto:true,ftype:type,fsw:type==='dsq'&&sw,chips,steps};
+}
+
+/* Рівень 3 — знайди помилку */
+const DESC={mid:'Пропущено подвоєний добуток $2ab$',half:'Добуток не подвоєно',sign:'Неправильний знак',coef:'Коефіцієнт не піднесено до квадрата',num:'Число не піднесено до квадрата',wrong:'Застосовано не ту формулу'};
+function genError(tier){
+  const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);
+  const {a2,b2,ab,ab2,ex,s}=basics(type,A,B);
+  const expr=coll(type,A,B,Math.random()<.5),right=`$${expr} = ${poly(ex)}$`;
+  const swapSq=(X,bad)=>ex.map(t=>abs(t)===abs(sq(X))?T(Math.sign(t.c)*bad.c,bad.v):t);
+  const errs=[];
+  if(type!=='dsq'){
+    errs.push({k:'mid',p:[a2,b2],e:'У квадраті двочлена <b>три</b> доданки: подвоєний добуток $2ab$ пропускати не можна.'});
+    errs.push({k:'half',p:[a2,scale(ab,s),b2],e:`Середній член — це $2ab = 2\\cdot ${abs(A)}\\cdot ${abs(B)} = ${abs(ab2)}$, а не $${abs(ab)}$.`});
+    errs.push(type==='diff'?{k:'sign',p:[a2,neg(ab2),neg(b2)],e:'$b^2$ — квадрат, тому він завжди зі знаком «+».'}:{k:'sign',p:[a2,neg(ab2),b2],e:'У квадраті суми всі знаки «+».'});
+  }else{
+    errs.push({k:'sign',p:[a2,b2],e:'У різниці квадратів між $a^2$ і $b^2$ стоїть «−».'});
+    errs.push({k:'wrong',p:[a2,neg(ab2),b2],e:'Дужки з різними знаками — це різниця квадратів $a^2 - b^2$, а не квадрат різниці.'});
+  }
+  const cT=[A,B].find(t=>!isNum(t)&&t.c!==1);
+  if(cT){const bad=T(cT.c,dbl(cT.v));errs.push({k:'coef',p:swapSq(cT,bad),e:`До квадрата підносимо і коефіцієнт: $${paren(cT)}^2 = ${abs(sq(cT))}$, а не $${abs(bad)}$.`});}
+  const nT=[A,B].find(t=>isNum(t)&&t.c>2);
+  if(nT){const bad=T(nT.c*2);errs.push({k:'num',p:swapSq(nT,bad),e:`$${nT.c}^2 = ${nT.c}\\cdot ${nT.c} = ${nT.c*nT.c}$, а не $${nT.c}\\cdot 2 = ${bad.c}$.`});}
+  const isOk=Math.random()<.3,er=isOk?null:pick(errs),shown=isOk?ex:er.p;
+  const head=`${expr} = ${poly(shown)}`;
+  const steps=[{q:'Чи правильно розкрито дужки?',opts:[txo('Правильно',isOk),txo('Є помилка',!isOk)],fixed:true,autoOk:!isOk,
+    note:isOk?`Розв’язання правильне: ${right}.`:`Тут є помилка. ${er.e} Правильно: ${right}.`}];
+  if(!isOk){const pool=(type==='dsq'?['sign','wrong','coef','num','mid']:['mid','half','sign','coef','num']).filter(k=>k!==er.k);
+    steps.push({q:'Що саме не так?',opts:shuffle([er.k,...shuffle(pool).slice(0,3)]).map(k=>txo(DESC[k],k===er.k)),one:true,note:`${er.e} Правильно: ${right}.`});}
+  return {type:'steps',label:'Розв’язання учня',head,qtxt:plain(head),ans:isOk?'Правильно':'Є помилка: '+plain(DESC[er.k]),ansH:tx(right),stopOnWrong:true,steps};
+}
+
+/* Рівень 4 — розкрий сам */
+function genTiles(tier){
+  const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);
+  const {a2,b2,ab,ab2,ex,s}=basics(type,A,B);
+  const expr=coll(type,A,B,Math.random()<.5),cor=ex.map(tile);
+  const cT=[A,B].find(t=>!isNum(t)&&t.c!==1),nT=[A,B].find(t=>isNum(t)&&t.c>2);
+  const sg=X=>(X===B&&type==='dsq')?-1:1;
+  const extra=[];
+  if(cT)extra.push(tile(scale(T(cT.c,dbl(cT.v)),sg(cT))));
+  if(nT)extra.push(tile(T(sg(nT)*nT.c*2)));
+  const pool=type==='dsq'?[ab2,neg(ab2),b2,neg(ab)]:[scale(ab,s),scale(ab2,-s),neg(b2),scale(ab2,2*s)];
+  const wr=[];for(const x of [...extra,...shuffle(pool.map(tile))]){if(!cor.includes(x)&&!wr.includes(x))wr.push(x);if(wr.length>=4)break;}
+  return {type:'tiles',head:expr,correct:cor,tiles:shuffle([...cor,...wr]),mid:type==='dsq'?null:tile(ex[1]),
+    ansTex:`${expr} = ${poly(ex)}`,qtxt:plain(expr),ans:plain(poly(ex)),ansH:K(`${expr} = ${poly(ex)}`)};
+}
+function genMissing(tier,n=4){
+  const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);
+  const {a,b,a2,b2,ab,ab2,ex,s}=basics(type,A,B);
+  const op=type==='sum'?'+':'-';
+  const sqW=X=>[abs(T(X.c,dbl(X.v))),abs(scale(X,2)),abs(X),abs(T(X.c*X.c*2,dbl(X.v))),abs(ab2),abs(T(X.c*X.c+1,dbl(X.v)))];
+  const rootW=X=>[abs(sq(X)),abs(scale(X,2)),abs(ab2),abs(T(X.c+1,X.v)),abs(ab),abs(T(X.c+2,X.v))];
+  const full=type==='dsq'?`${poly(ex)} = ${coll('dsq',A,B)}`:`${coll(type,A,B)} = ${poly(ex)}`;
+  const v=type==='dsq'?rnd(4,5):rnd(1,3);let head,cor,wr;
+  if(v===1){head=`(${a} ${op} ${BL})^2 = ${poly(ex)}`;cor=b;wr=rootW(B);}
+  else if(v===2){head=`${coll(type,A,B)} = ${abs(a2)}\\;${BL}\\;+ ${abs(b2)}`;cor=tile(ex[1]);
+    wr=[tile(neg(ex[1])),tile(scale(ab,s)),tile(scale(ab,-s)),tile(scale(ab2,2*s)),tile(scale(ab2,-2*s))];}
+  else if(v===3){head=`${coll(type,A,B)} = ${poly([a2,ex[1]])} + ${BL}`;cor=abs(b2);wr=sqW(B);}
+  else if(v===4){head=`${BL} - ${abs(b2)} = ${coll('dsq',A,B)}`;cor=abs(a2);wr=sqW(A);}
+  else{head=`${poly(ex)} = (${a} - ${BL})(${a} + ${BL})`;cor=b;wr=rootW(B);}
+  return {type:'steps',head,qtxt:plain(head),ans:plain(cor),ansH:K(full),
+    steps:[{q:'Що треба поставити замість $\\square$?',opts:mk(cor,wr,n),note:`$${full}$`}]};
+}
+
+/* Рівень 5 — згорни */
+function wrongColl(type,A,B){const a=abs(A),b=abs(B),a2=abs(sq(A)),b2=abs(sq(B)),b2x=abs(scale(B,2));
+  if(type==='sum')return[coll('diff',A,B),coll('dsq',A,B),`(${a} + ${b2})^2`,`(${a} + ${b2x})^2`,`(${a2} + ${b})^2`];
+  if(type==='diff')return[coll('sum',A,B),coll('dsq',A,B),`(${a} - ${b2})^2`,`(${a} - ${b2x})^2`,`(${a2} - ${b})^2`];
+  return[coll('diff',A,B),coll('sum',A,B),`(${a} - ${b2})(${a} + ${b2})`,`(${a2} - ${b})(${a2} + ${b})`,`(${b} - ${a})(${b} + ${a})`];}
+function genFactor(tier){
+  const none=tier>1&&Math.random()<.18;
+  const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);
+  const {a,b,a2,b2,ab,ab2,ex}=basics(type,A,B);
+  let head,cor,note,opts;
+  if(none){const r=Math.random()<.5;
+    head=r?poly([a2,b2]):poly([a2,scale(ab,pick([1,-1])),b2]);
+    note=r?'Це <b>сума</b> квадратів — такої формули немає, на множники вона не розкладається.'
+      :`Якби це був квадрат двочлена, посередині стояло б $2\\cdot ${a}\\cdot ${b} = ${abs(ab2)}$. Тут $${abs(ab)}$, тож формула не підходить.`;
+    opts=[...mk(coll('sum',A,B),[coll('diff',A,B),coll('dsq',A,B)]).map(o=>({...o,ok:false})),txo(NOPE,true)];cor=NOPE;
+  }else{head=poly(ex);cor=coll(type,A,B);
+    note=type==='dsq'?`$${abs(a2)} = ${paren(A)}^2$, $${abs(b2)} = ${paren(B)}^2$, між ними «−», отже $${head} = ${cor}$.`
+      :`$${abs(a2)} = ${paren(A)}^2$, $${abs(b2)} = ${paren(B)}^2$, посередині $2\\cdot ${a}\\cdot ${b} = ${abs(ab2)}$. Знак «${type==='sum'?'+':'−'}», отже $${head} = ${cor}$.`;
+    opts=[...mk(cor,wrongColl(type,A,B)),txo(NOPE,false)];}
+  return {type:'steps',head,qtxt:plain(head),ans:none?NOPE:plain(cor),ansH:none?NOPE:K(`${head} = ${cor}`),
+    steps:[{q:'Запиши цей многочлен як квадрат дужки або як добуток двох дужок. Який запис правильний?',how:'Як шукати: 1) знайди доданки, які є квадратами, — це $a^2$ і $b^2$; 2) звідси $a$ і $b$; 3) перевір, чи є посередині $2ab$ і який у нього знак.',opts,fixed:true,one:true,note}]};
+}
+
+/* Рівень 6 — тест у форматі НМТ */
+function wrongExp(type,A,B){const {a2,b2,ab,ab2,s}=basics(type,A,B);
+  if(type==='dsq')return[poly([a2,b2]),poly([a2,neg(ab2),b2]),poly([a2,ab2,b2]),poly([a2,neg(scale(B,2))]),poly([a2,neg(ab2),neg(b2)])];
+  const r=[poly([a2,b2]),poly([a2,scale(ab,s),b2]),poly([a2,scale(ab2,-s),b2]),poly([a2,scale(ab2,s),neg(b2)]),poly([a2,neg(b2)])];
+  const cT=[A,B].find(t=>!isNum(t)&&t.c!==1);
+  if(cT)r.splice(1,0,poly(expand(type,A,B).map(t=>abs(t)===abs(sq(cT))?T(Math.sign(t.c)*cT.c,dbl(cT.v)):t)));
+  return r;}
+function exE(tier){const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);const expr=coll(type,A,B,Math.random()<.5),cor=poly(expand(type,A,B));
+  return {type:'steps',exam:true,head:expr,qtxt:plain(expr),ans:plain(cor),ansH:K(cor),steps:[{q:'Укажіть вираз, тотожно рівний даному.',opts:mk(cor,shuffle(wrongExp(type,A,B)),5)}]};}
+function exF(tier){const type=pick(['sum','diff','dsq']);const [A,B]=pair(tier);const head=poly(expand(type,A,B)),cor=coll(type,A,B);
+  return {type:'steps',exam:true,head,qtxt:plain(head),ans:plain(cor),ansH:K(cor),steps:[{q:'Розкладіть вираз на множники.',opts:mk(cor,shuffle(wrongColl(type,A,B)),5)}]};}
+function exM(tier){const t=genMissing(tier,5);t.exam=true;return t;}
+function exS(tier){const [A,B]=pair(tier);const {a2,b2,ab,ab2}=basics('sum',A,B);const v=rnd(1,3);let head,cor,wr;
+  if(v===1){head=`${coll('sum',A,B)} - ${abs(a2)}`;cor=poly([ab2,b2]);wr=[poly([b2]),poly([ab,b2]),poly([ab2]),poly([ab2,neg(b2)]),poly([scale(a2,2),ab2,b2])];}
+  else if(v===2){head=`${coll('dsq',A,B)} + ${abs(b2)}`;cor=abs(a2);wr=[poly([a2,scale(b2,2)]),poly([a2,neg(scale(b2,2))]),abs(scale(b2,2)),poly([a2,neg(ab2),scale(b2,2)]),poly([a2,b2])];}
+  else{head=`${coll('diff',A,B)} + ${abs(ab2)}`;cor=poly([a2,b2]);wr=[poly([a2,neg(b2)]),poly([a2,neg(scale(ab2,2)),b2]),poly([a2,ab2,b2]),poly([b2]),poly([a2,neg(ab2),b2])];}
+  return {type:'steps',exam:true,head,qtxt:plain(head),ans:plain(cor),ansH:K(cor),steps:[{q:'Спростіть вираз.',opts:mk(cor,shuffle(wr),5)}]};}
+function exMatch(dir){const v=pick(VARS);const A=dir===1?T(1,{[v]:1}):T(rnd(2,5),{[v]:1}),B=T(rnd(2,9));
+  const a=abs(A),b=abs(B),a2=sq(A),b2=sq(B);
+  const L=[coll('sum',A,B),coll('diff',A,B),coll('dsq',A,B),`(${b} - ${a})(${b} + ${a})`];
+  const R=[poly(expand('sum',A,B)),poly(expand('diff',A,B)),poly([a2,neg(b2)]),poly([b2,neg(a2)])];
+  const rows=dir===1?L:R,colList=[...(dir===1?R:L),dir===1?poly([a2,b2]):`(${a} + ${abs(b2)})^2`];
+  const order=shuffle([0,1,2,3,4]),cols=order.map(i=>colList[i]);
+  const rs=shuffle([0,1,2,3]).map(i=>({tex:rows[i],ok:order.indexOf(i)}));
+  return {type:'match',exam:true,rows:rs,cols,
+    q:dir===1?'Установіть відповідність між виразом (1–4) і тотожно рівним йому многочленом (А–Д).':'Установіть відповідність між многочленом (1–4) і його розкладом на множники (А–Д).',
+    qtxt:'Відповідність: '+rs.map((r,i)=>`${i+1}) ${plain(r.tex)}`).join('; '),
+    ans:rs.map((r,i)=>`${i+1}–${LET[r.ok]}`).join(', ')};}
+function genExam(){const t=[exE(1),exF(1),exS(1),exM(2),exE(2),exF(2),exS(2),exE(3),exMatch(1),exMatch(2)];
+  t.forEach((x,i)=>x.label=`Завдання ${i+1}`);return t;}
+
+const LEVELS=[
+  {n:1,title:'Яка це формула?',desc:'Впізнай формулу з першого погляду',build:()=>[1,1,1,2,2,2,2,3,3,3].map(genIdent)},
+  {n:2,title:'Крок за кроком',desc:'Знайди a і b, піднеси до квадрата, збери відповідь',build:()=>[1,1,2,2,3,3].map(genSteps)},
+  {n:3,title:'Знайди помилку',desc:'Перевір розв’язання іншого учня',build:()=>[1,1,2,2,2,2,3,3,3,3].map(genError)},
+  {n:4,title:'Розкрий дужки сам',desc:'Збери відповідь із доданків і знайди пропущене',build:()=>[1,1,2,2,2,2,3,3,3,3].map((t,i)=>i%3===2?genMissing(t):genTiles(t))},
+  {n:5,title:'Згорни у формулу',desc:'Розклади многочлен на множники',build:()=>[1,1,1,2,2,2,2,3,3,3].map(genFactor)},
+  {n:6,title:'Тест як на НМТ',desc:'8 завдань з вибором відповіді і 2 на відповідність',exam:true,build:genExam},
+];
+
+/* ---------- інтерфейс ---------- */
+let S=null,app;
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('fsm-'+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},
+  set(k,v){try{localStorage.setItem('fsm-'+k,JSON.stringify(v));}catch(e){}}};
+function dev(){let d=store.get('dev','');if(!d){d=Math.random().toString(36).slice(2,8);store.set('dev',d);}return d;}
+function log(event,d={}){
+  if(!SHEET_URL||!S)return;
+  const body=JSON.stringify({time:new Date().toLocaleString('uk-UA'),name:'Тренажер ФСМ',device:dev(),attempt:S.attempt,event,...d});
+  try{fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body,keepalive:true}).catch(()=>{});}catch(e){}
+}
+const PRAISE=['Так!','Правильно!','Точно!','Саме так!'];
+
+function cardsHtml(){
+  return `<div class="fcards">${['sum','diff','dsq'].map(f=>`<div class="fcard f-${f}"><span class="fname">${FN[f]}</span>${K(FULL[f],true)}</div>`).join('')}</div>
+  <ul class="memo"><li>Квадрат суми й квадрат різниці — <b>три</b> доданки, посередині подвоєний добуток ${K('\\htmlClass{mid}{2ab}')}.</li>
+  <li>Різниця квадратів — <b>два</b> доданки і «−» між ними.</li>
+  <li>${K('b^2')} у квадраті двочлена завжди зі знаком «+».</li></ul>`;
+}
+
+function home(pending){
+  S=null;const stars=store.get('stars',{});
+  app.innerHTML=`<header><h1>Формули скороченого множення</h1>
+    <p class="lead">Тренажер до НМТ. Навчись розрізняти три формули з першого погляду і не губити подвоєний добуток.</p>${cardsHtml()}</header>
+    <h2>Рівні</h2>
+    <ol class="route">${LEVELS.map(L=>{const s=stars[L.n]||0;return `<li><button class="lvl${L.exam?' exam':''}${pending===L.n?' pending':''}" data-n="${L.n}">
+      <span class="num">${L.n}</span><span><b>${L.title}</b><small>${L.desc}</small></span>
+      <span class="st" aria-label="Зірок: ${s} з 3">${'★'.repeat(s)}${'☆'.repeat(3-s)}</span></button></li>`;}).join('')}</ol>`;
+  app.querySelectorAll('.lvl').forEach(b=>b.onclick=()=>startLevel(+b.dataset.n));
+  window.scrollTo(0,0);
+}
+
+function startLevel(n){
+  const L=LEVELS[n-1],tasks=L.build();
+  tasks.forEach((t,i)=>{t.no=i+1;t.base=true;});
+  const attempt=store.get('att',0)+1;store.set('att',attempt);
+  S={L,queue:tasks,i:0,pts:0,max:tasks.reduce((s,t)=>s+(t.type==='match'?4:1),0),gotMax:0,done:0,nBase:tasks.length,hints:0,all:[],attempt,t0:Date.now(),finished:false};
+  renderTask();
+}
+function prep(t){Object.assign(t,{si:0,mist:false,log:[],chosen:[],t0:Date.now(),revealed:0,showScaf:false,sel:[],pick:null,mpick:[],checked:false});}
+
+function renderTask(){
+  const t=S.queue[S.i];if(t.t0===undefined)prep(t);
+  app.innerHTML=`<div class="topbar"><button class="ghost" id="back">До рівнів</button><span class="lt">${S.L.n}. ${S.L.title}</span><button class="ghost" id="hb">Формули</button></div>
+    <div class="bar"><i style="width:${Math.round(100*S.i/S.queue.length)}%"></i></div>
+    <div class="count">Завдання ${S.i+1} з ${S.queue.length}${t.rep?'<span class="rep">повтор</span>':''}</div>
+    <section class="task" id="task" aria-live="polite"></section>`;
+  $('#back').onclick=leave;$('#hb').onclick=openHint;
+  ({steps:renderSteps,tiles:renderTiles,match:renderMatch})[t.type](t);
+  window.scrollTo(0,0);
+}
+
+function scafHtml(t){
+  if(!t.ftype||!t.showScaf)return '';
+  return `<div class="scaf f-${t.ftype}">${K(t.fsw?'(a+b)(a-b)=a^2-b^2':FULL[t.ftype])}<div class="chips">${t.chips.map((c,i)=>
+    `<span class="chip${i<t.revealed?' on':''}">${K(c[0]+' = '+(i<t.revealed?c[1]:'?'))}</span>`).join('')}</div></div>`;
+}
+function showFb(ok,note,neutral){
+  const fb=$('#fb');fb.hidden=false;fb.className='fb'+(neutral?'':ok?' ok':' bad');
+  fb.innerHTML=neutral?tx(note):`<b>${ok?pick(PRAISE):'Не зовсім.'}</b>${tx(note||'')}`;
+}
+function showNext(label,fn){const nx=$('#next');nx.textContent=label;nx.hidden=false;nx.onclick=fn;nx.scrollIntoView({block:'nearest'});nx.focus({preventScroll:true});}
+
+function renderSteps(t){
+  const box=$('#task'),si=t.si,st=t.steps[si];
+  const one=st.one||st.opts.some(o=>o.t.length>13);
+  box.innerHTML=`${t.label?`<div class="label">${t.label}</div>`:''}<div class="expr">${K(t.head,true)}</div>
+    <div id="scaf">${scafHtml(t)}</div>
+    <p class="q">${tx(st.q)}</p>${st.how?`<p class="how">${tx(st.how)}</p>`:''}
+    <div class="opts${one?' one':''}">${st.opts.map((o,j)=>`<button class="opt${o.f?' f f-'+o.f:''}" data-j="${j}">${t.exam?`<span class="let">${LET[j]}</span>`:''}<span>${o.h}</span></button>`).join('')}</div>
+    <div class="fb" id="fb" hidden></div>
+    <div class="act"><button class="main" id="next" hidden>Далі</button></div>`;
+  const btns=[...box.querySelectorAll('.opt')];
+  btns.forEach(b=>b.onclick=()=>{
+    const j=+b.dataset.j,o=st.opts[j];
+    if(t.exam){
+      btns.forEach(x=>x.classList.toggle('sel',x===b));t.pick=j;
+      showNext(S.i===S.queue.length-1?'Завершити':'Далі',()=>finishTask(t,o.ok,o.t));
+      return;
+    }
+    btns.forEach(x=>x.disabled=true);
+    b.classList.add(o.ok?'ok':'bad');
+    if(!o.ok){btns[st.opts.findIndex(x=>x.ok)].classList.add('ok');t.mist=true;t.log.push(`${plain(st.q)} ${o.t}`);}
+    t.chosen.push(o.t);
+    if(si===0)t.showScaf=true;
+    if(st.chip!==undefined)t.revealed=st.chip+1;
+    $('#scaf').innerHTML=scafHtml(t);
+    const last=si===t.steps.length-1||(!o.ok&&t.stopOnWrong);
+    if(o.ok&&!last&&(t.auto||st.autoOk)){setTimeout(()=>{t.si=si+1;renderSteps(t);},650);return;}
+    showFb(o.ok,st.note);
+    if(last)showNext('Наступне завдання',()=>finishTask(t,!t.mist,t.mist?t.log.join('; '):t.chosen[t.chosen.length-1]));
+    else showNext('Далі',()=>{t.si=si+1;renderSteps(t);});
+  });
+}
+
+function renderTiles(t){
+  const box=$('#task');
+  box.innerHTML=`<div class="expr">${K(t.head,true)}</div>
+    <p class="q">Розкрий дужки: вибери доданки, з яких складається відповідь.</p>
+    <div class="ansbox" id="ans"></div>
+    <div class="tiles">${t.tiles.map((x,j)=>`<button class="tile" data-j="${j}">${K(x)}</button>`).join('')}</div>
+    <div class="fb" id="fb" hidden></div>
+    <div class="act"><button class="ghost" id="clr">Очистити</button><button class="main" id="chk">Перевірити</button><button class="main" id="next" hidden>Далі</button></div>`;
+  const tb=[...box.querySelectorAll('.tile')];
+  const sel=()=>t.sel.map(j=>t.tiles[j]);
+  const draw=()=>{const s=sel();
+    $('#ans').innerHTML=s.length?K(`${t.head} = ${s.map((x,i)=>i===0?x.replace(/^\+/,''):x).join(' ')}`):'<span class="ph">Натискай на доданки — тут з’явиться відповідь</span>';
+    tb.forEach(b=>b.classList.toggle('used',t.sel.includes(+b.dataset.j)));};
+  draw();
+  tb.forEach(b=>b.onclick=()=>{if(t.checked)return;const j=+b.dataset.j,k=t.sel.indexOf(j);k>=0?t.sel.splice(k,1):t.sel.push(j);$('#fb').hidden=true;draw();});
+  $('#clr').onclick=()=>{t.sel=[];draw();};
+  $('#chk').onclick=()=>{
+    if(!t.sel.length){showFb(false,'Спочатку вибери доданки.',true);return;}
+    t.checked=true;const s=sel();
+    const ok=[...s].sort().join('|')===[...t.correct].sort().join('|');
+    tb.forEach(b=>{const j=+b.dataset.j,x=t.tiles[j],inC=t.correct.includes(x),inS=t.sel.includes(j);
+      b.disabled=true;b.classList.remove('used');if(inS)b.classList.add(inC?'ok':'bad');else if(inC)b.classList.add('miss');});
+    const tip=!ok&&t.mid&&!s.includes(t.mid)?' Не забувай подвоєний добуток $2ab$ — він стоїть посередині.':'';
+    showFb(ok,ok?`$${t.ansTex}$`:`Правильно: $${t.ansTex}$.${tip}`);
+    $('#clr').hidden=true;$('#chk').hidden=true;
+    showNext('Наступне завдання',()=>finishTask(t,ok,plain(s.map((x,i)=>i===0?x.replace(/^\+/,''):x).join(' '))));
+  };
+}
+
+function renderMatch(t){
+  const box=$('#task');
+  box.innerHTML=`<div class="label">${t.label}</div><p class="q">${t.q}</p>
+    <div class="mcols">${t.cols.map((c,j)=>`<div class="mc"><span class="let">${LET[j]}</span>${K(c)}</div>`).join('')}</div>
+    <div>${t.rows.map((r,i)=>`<div class="mr"><div class="mrq"><span class="no">${i+1}</span>${K(r.tex)}</div>
+      <div class="mbtns">${LET.map((L,j)=>`<button data-i="${i}" data-j="${j}" aria-label="${i+1}: ${L}">${L}</button>`).join('')}</div></div>`).join('')}</div>
+    <div class="act"><button class="main" id="next">${S.i===S.queue.length-1?'Завершити':'Далі'}</button></div>`;
+  box.querySelectorAll('.mbtns button').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;t.mpick[i]=+b.dataset.j;
+    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));});
+  $('#next').onclick=()=>{
+    const answered=t.mpick.filter(x=>x!=null).length;
+    if(answered<4&&!confirm('Не всі рядки мають відповідь. Перейти далі?'))return;
+    const got=t.rows.filter((r,i)=>t.mpick[i]===r.ok).length;
+    finishTask(t,got===4,t.rows.map((r,i)=>`${i+1}–${t.mpick[i]!=null?LET[t.mpick[i]]:'?'}`).join(', '),got);
+  };
+}
+
+function cloneRep(t){
+  const c=JSON.parse(JSON.stringify(t));
+  ['t0','ok','got','your'].forEach(k=>delete c[k]);
+  c.rep=true;c.base=false;
+  if(c.steps)c.steps.forEach(st=>{if(!st.fixed)st.opts=shuffle(st.opts);});
+  if(c.tiles)c.tiles=shuffle(c.tiles);
+  return c;
+}
+function finishTask(t,ok,chosen,earned){
+  const max=t.type==='match'?4:1;earned=earned??(ok?1:0);
+  if(t.base){S.done++;S.pts+=earned;S.gotMax+=max;S.all.push(t);}
+  t.ok=ok;t.got=earned;t.your=chosen;
+  log('Відповідь',{num:t.rep?`${t.no} (повтор)`:String(t.no),q:t.qtxt,chosen,correct:t.ans,ok,sec:Math.round((Date.now()-t.t0)/1000)});
+  if(!ok&&!S.L.exam&&!t.rep)S.queue.splice(Math.min(S.i+3,S.queue.length),0,cloneRep(t));
+  S.i++;
+  if(S.i<S.queue.length)renderTask();else finishRound();
+}
+
+function reviewItem(t){
+  if(t.type==='match')return `<li class="${t.ok?'ok':''}"><div>${t.q}</div><div class="ra">Твоя відповідь: ${esc(t.your)}<br>Правильно: ${t.ans} (${t.got} з 4)</div></li>`;
+  return `<li class="${t.ok?'ok':''}">${K(t.head)}<div class="ra">Правильно: ${t.ansH}${t.ok?'':`<br>Твоя відповідь: ${esc(t.your)}`}</div></li>`;
+}
+function finishRound(){
+  S.finished=true;
+  const r=S.pts/S.max,st=r>=.9?3:r>=.7?2:r>=.5?1:0;
+  const best=store.get('stars',{});if((best[S.L.n]||0)<st){best[S.L.n]=st;store.set('stars',best);}
+  log('Завершила тест',{q:`Рівень ${S.L.n}. ${S.L.title}`,score:`${S.pts}/${S.max}${S.hints?`, підказок: ${S.hints}`:''}`,sec:Math.round((Date.now()-S.t0)/1000)});
+  const msg=['Відкрий «Формули», повтори їх і спробуй ще раз.','Непогано, але рівень варто пройти ще раз.','Добре. Ще одне проходження — і буде впевнено.','Відмінно! Формули впізнаються з першого погляду.'][st];
+  const list=S.L.exam?S.all:S.all.filter(t=>!t.ok);
+  app.innerHTML=`<div class="topbar"><button class="ghost" id="back">До рівнів</button><span class="lt">${S.L.n}. ${S.L.title}</span></div>
+    <div class="score">${S.pts} <span>з ${S.max}</span></div>
+    <div class="bigstars" aria-label="Зірок: ${st} з 3">${'★'.repeat(st)}${'☆'.repeat(3-st)}</div>
+    <p>${msg}${S.L.exam?'':' Рахуються відповіді з першої спроби.'}</p>
+    ${list.length?`<h2>${S.L.exam?'Розбір':'Де були помилки'}</h2><ul class="review">${list.map(reviewItem).join('')}</ul>`:''}
+    <div class="act"><button class="ghost" id="again">Пройти ще раз</button>${S.L.n<6?'<button class="main" id="nextL">Наступний рівень</button>':''}</div>`;
+  const n=S.L.n;
+  $('#back').onclick=()=>home();
+  $('#again').onclick=()=>startLevel(n);
+  if(n<6)$('#nextL').onclick=()=>startLevel(n+1);
+  window.scrollTo(0,0);
+}
+
+function abort(){
+  if(!S||S.finished||S.aborted||!S.done)return;S.aborted=true;
+  log('Перервала тест',{q:`Рівень ${S.L.n}. ${S.L.title}`,score:`${S.pts}/${S.gotMax} (зроблено ${S.done} з ${S.nBase})`,sec:Math.round((Date.now()-S.t0)/1000)});
+}
+function leave(){
+  if(S&&!S.finished&&S.done>0){if(!confirm('Вийти з рівня? Це проходження не збережеться.'))return;abort();}
+  home();
+}
+function openHint(){if(S&&!S.finished)S.hints++;const h=$('#hint');h.hidden=false;$('#hclose').focus();}
+function closeHint(){$('#hint').hidden=true;}
+
+function boot(){
+  app=$('#app');
+  const h=document.createElement('div');h.className='overlay';h.id='hint';h.hidden=true;
+  h.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Формули"><header><h2>Формули</h2><button class="ghost" id="hclose">Закрити</button></header>${cardsHtml()}</div>`;
+  document.body.appendChild(h);
+  h.onclick=e=>{if(e.target===h)closeHint();};
+  $('#hclose').onclick=closeHint;
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHint();});
+  addEventListener('pagehide',abort);
+  const m=location.hash.match(/^#l([1-6])$/),n=m?+m[1]:null;
+  if(n)startLevel(n);else home();
+}
+if(typeof document!=='undefined')boot();
+</script>
+</body>
+</html>
